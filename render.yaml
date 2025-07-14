@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: flask-grade-system
+    name: grade_system_in_oline
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
