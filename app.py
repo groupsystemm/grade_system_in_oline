@@ -1,4 +1,4 @@
-import os
+import os 
 import io
 import pandas as pd
 from flask import Flask, render_template, request, redirect, session, send_file
@@ -8,7 +8,6 @@ from passlib.context import CryptContext
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "my-dev-secret-key"
-
 
 def create_default_admin():
     conn = create_connection()
@@ -22,11 +21,9 @@ def create_default_admin():
     cursor.close()
     conn.close()
 
-
 @app.route('/')
 def home():
     return redirect('/login')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -46,7 +43,6 @@ def login():
         cursor.close()
         conn.close()
     return render_template('login.html', error=error)
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -71,7 +67,6 @@ def register():
         conn.close()
     return render_template("register.html", message=message, error=error)
 
-
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
@@ -84,7 +79,6 @@ def dashboard():
     elif role == 'admin':
         return render_template('admin_dashboard.html', name=session['name'])
     return redirect('/login')
-
 
 @app.route('/add-course', methods=['GET', 'POST'])
 def add_course():
@@ -107,7 +101,6 @@ def add_course():
     conn.close()
     return render_template('add_course.html', message=message, error=error)
 
-
 @app.route('/admin/courses')
 def manage_courses():
     if session.get('role') != 'admin':
@@ -119,7 +112,6 @@ def manage_courses():
     cursor.close()
     conn.close()
     return render_template("admin_courses.html", courses=courses)
-
 
 @app.route('/add-grade', methods=['GET', 'POST'])
 def add_grade():
@@ -152,7 +144,6 @@ def add_grade():
     cursor.close()
     conn.close()
     return render_template('add_grade.html', students=students, courses=courses, message=message, error=error)
-
 
 @app.route('/view-grades')
 def view_grades():
@@ -191,10 +182,7 @@ def view_grades():
         final = g.get('final_exam') or 0
         assignment = g.get('assignment') or 0
         quiz = g.get('quiz') or 0
-        
-        # Here is the change: total is just the sum of raw scores
         total = mid + final + assignment + quiz
-        
         cleaned_grades.append({
             'course_name': g['course_name'],
             'mid_exam': mid,
@@ -238,12 +226,10 @@ def view_all_grades():
         else: return "F"
 
     for row in all_grades:
-        # Calculate total as sum of components (no weighting)
         mid = row.get('mid_exam') or 0
         final = row.get('final_exam') or 0
         assignment = row.get('assignment') or 0
         quiz = row.get('quiz') or 0
-
         total = round(mid + final + assignment + quiz, 2)
         row['total'] = total
         row['letter'] = letter(total)
@@ -275,7 +261,6 @@ def download_grades():
     return send_file(output, download_name=f"{session['name']}_grades.xlsx", as_attachment=True,
                      mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-
 @app.route('/admin/students')
 def admin_students():
     if session.get('role') != 'admin':
@@ -287,7 +272,6 @@ def admin_students():
     cursor.close()
     conn.close()
     return render_template("admin_students.html", students=students)
-
 
 @app.route('/admin/teachers')
 def admin_teachers():
@@ -301,19 +285,16 @@ def admin_teachers():
     conn.close()
     return render_template("admin_teachers.html", teachers=teachers)
 
-
 @app.route('/admin')
 def admin():
     if session.get('role') != 'admin':
         return redirect('/login')
     return render_template('admin_dashboard.html', name=session['name'])
 
-
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect('/login')
-
 
 if __name__ == '__main__':
     create_default_admin()
